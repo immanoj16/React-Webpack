@@ -40,8 +40,14 @@ module.exports = {
             //     collapseWhitespace: true
             // },
             hash: true,
-            template: './src/index.ejs', // Load a custom template (ejs by default see the FAQ for details)
-          }),
+            template: './src/index.html', // Load a custom template (ejs by default see the FAQ for details)
+        }),
+        new HtmlWebpackPlugin({
+            title: 'Contact Page',
+            hash: true,
+            filename: 'contact.html',
+            template: './src/contact.html'
+        }),
         new ExtractTextPlugin({
             filename: "app.css",
             disable: false,
