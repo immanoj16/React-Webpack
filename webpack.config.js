@@ -1,11 +1,21 @@
 var HtmlWebpackPlugin = require('html-webpack-plugin');
 const ExtractTextPlugin = require("extract-text-webpack-plugin");
-var path = require("path");
+var path = require('path');
+var webpack = require('webpack');
+
+var isProd = process.env.NODE_ENV === 'production';
+var cssDev = ['style-loader', 'css-loader', 'sass-loader'];
+var cssProd = ExtractTextPlugin.extract({
+    fallback: 'style-loader',
+    use: ['css-loader', 'sass-loader'],
+    publicPath: '/dist'
+})
+
+var cssConfig = isProd ? cssProd : cssDev;
 
 module.exports = {
     entry: {
         app: './src/app.js',
-        contact: './src/contact.js'
     },
     output: {
         path: path.resolve(__dirname, "dist"),
@@ -16,11 +26,7 @@ module.exports = {
             {
                 test: /\.scss$/,
                 // use: ['style-loader', 'css-loader', 'sass-loader']
-                use: ExtractTextPlugin.extract({
-                    fallback: 'style-loader',
-                    use: ['css-loader', 'sass-loader'],
-                    publicPath: '/dist'
-                })
+                use: cssConfig
             },
             {
                 test: /\.js$/,
@@ -33,6 +39,7 @@ module.exports = {
         contentBase: path.join(__dirname, "dist"),
         compress: true,
         port: 9000,
+        hot: true,
         stats: "errors-only",
         open: true
     },
@@ -43,21 +50,17 @@ module.exports = {
             //     collapseWhitespace: true
             // },
             hash: true,
-            excludeChunks: ['contact'],
-            template: './src/index.html', // Load a custom template (ejs by default see the FAQ for details)
-        }),
-        new HtmlWebpackPlugin({
-            title: 'Contact Page',
-            hash: true,
-            chunks: ['contact'],
-            filename: 'contact.html',
-            template: './src/contact.html'
+            template: './src/index.html' // Load a custom template (ejs by default see the FAQ for details)
         }),
         new ExtractTextPlugin({
             filename: "app.css",
-            disable: false,
+            disable: !isProd,
             allChunks: true
-        })
-        // new ExtractTextPlugin('app.css')
+        }),
+        new webpack.HotModuleReplacementPlugin(),
+        // enable HMR Globally
+
+        new webpack.NamedModulesPlugin(),
+        // Prints more readable module names in the browser
     ]
 }
